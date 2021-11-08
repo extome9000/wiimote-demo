@@ -57,7 +57,7 @@ class MyApp(ShowBase):
 					self.buttonA.setColor(1,1,1,1)
 				elif lib.wiimote.RIGHT_BYTE_BINDINGS[data[2]] == "b":
 					self.buttonB.setColor(1,1,1,1)
-				else data[2] == 0:
+				elif data[2] == 0:
 					self.buttonA.setColor(1,1,1,.25)
 					self.buttonB.setColor(1,1,1,.25)
 				x, y, z = data[3]-128, data[4]-128, data[5]-128
