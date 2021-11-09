@@ -1,5 +1,5 @@
 # Wiimote Demo
-This is a demo that utilizes the Wiimote. This was made for a class.
+This is a demo that utilizes the Wiimote.
 
 ---
 ## How to use

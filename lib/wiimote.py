@@ -56,7 +56,7 @@ class Wiimote:
     def start(self) -> bool:
         try:
             self.device.open(vendor_id=self.vendorID, product_id=self.productID)
-            #self.device.set_nonblocking(1)
+            self.device.set_nonblocking(1)
             #print("Manufacturer: %s" % self.device.get_manufacturer_string())
             #print("Product: %s" % self.device.get_product_string())
             #print("Serial No: %s" % self.device.get_serial_number_string())
@@ -68,7 +68,7 @@ class Wiimote:
             self.connected = False
 
     def feedback(self):
-        return self.device.read(max_length=64, timeout_ms=0.1)
+        return self.device.read(max_length=64, timeout_ms=0)
 
     def changeReportingMode(self, reportingMode: str) -> None:
         if reportingMode not in REPORTING_MODES:

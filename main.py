@@ -46,25 +46,15 @@ class MyApp(ShowBase):
 		self.wiimote.setR(task.time*100.0)
 		return Task.cont
 
-	def _round(self, num: int, div: int) -> int:
-		return num-(num%div)
-
 	def getData(self, task):
 		data = self.controller.feedback()
 		if data:
 			if data[0] == 0x31:
-				if lib.wiimote.RIGHT_BYTE_BINDINGS[data[2]] == "a":
-					self.buttonA.setColor(1,1,1,1)
-				elif lib.wiimote.RIGHT_BYTE_BINDINGS[data[2]] == "b":
-					self.buttonB.setColor(1,1,1,1)
-				else data[2] == 0:
-					self.buttonA.setColor(1,1,1,.25)
-					self.buttonB.setColor(1,1,1,.25)
 				x, y, z = data[3]-128, data[4]-128, data[5]-128
 				r = math.atan2(y,z) * (180/math.pi) + 90
 				p = math.atan2(-x,math.sqrt(y*y + z*z)) * (180/math.pi)
 				# Yaw is impossible to calculate without a gyroscope or compass.
-				self.wiimote.setHpr(180,self._round(int(r),2),self._round(int(p),2))
+				self.wiimote.setHpr(180,r,p)
 		return Task.cont
 
 if __name__ == "__main__":
