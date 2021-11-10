@@ -64,7 +64,7 @@ class Wiimote:
             self.connected = True
             self.changeLED(1)
         except IOError:
-            print("Wiimote.start(): Could not open HID connection.")
+            raise ValueError
             self.connected = False
 
     def feedback(self):
