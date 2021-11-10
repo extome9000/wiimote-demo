@@ -52,6 +52,9 @@ class App(ShowBase):
 			self.controller = lib.wiimote.Wiimote()
 			self.controller.start()
 			self.controller.changeReportingMode("CoreButtonsAccelerometer")
+			self.rSm = []
+			self.pSm = []
+			self.rpMax = 20
 			self.taskMgr.add(self.getData,"WiimoteFeedback")
 		except ValueError:
 			self.buttonDisconnected = ButtonVisual(image="Controller_Disconnected",pos=(0,0,0),scale=0.5)
@@ -76,8 +79,25 @@ class App(ShowBase):
 			x, y, z = data[3]-128, data[4]-128, data[5]-128
 			r = math.atan2(y,z) * (180/math.pi) + 90
 			p = math.atan2(-x,math.sqrt(y*y + z*z)) * (180/math.pi)
+			
+			if len(self.rSm) == self.rpMax:
+				self.rSm.insert(0,r)
+				self.rSm.pop()
+			else:
+				self.rSm.insert(0,r)
+
+			if len(self.pSm) == self.rpMax:
+				self.pSm.insert(0,p)
+				self.pSm.pop()
+			else:
+				self.pSm.insert(0,p)
+
+			rAvg = sum(self.rSm) / len(self.rSm)
+			pAvg = sum(self.pSm) / len(self.pSm)
+
+
 			# Yaw is impossible to calculate without a gyroscope or compass.
-			self.wiimote.setHpr(180,r,p)
+			self.wiimote.setHpr(180,rAvg,pAvg)
 
 		return Task.cont
 
