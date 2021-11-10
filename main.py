@@ -7,9 +7,21 @@ from direct.gui.OnscreenImage import OnscreenImage
 import lib.wiimote
 import math
 
-class MyApp(ShowBase):
+GLYPH_PATH = "resources/glyphs/"
+
+
+class ButtonVisual(OnscreenImage):
+	def __init__(self, image: str, pos: tuple, scale: int) -> None:
+		super().__init__(image=GLYPH_PATH+image+".png")
+		self.setTransparency(TransparencyAttrib.MAlpha)
+		self.setPos(pos[0],pos[1],pos[2])
+		self.setScale(scale)
+		self.setColor(1,1,1,0.25)
+
+
+class App(ShowBase):
 	def __init__(self):
-		ShowBase.__init__(self)
+		super().__init__(self)
 
 		#self.accept("space", self.throwWiimote)
 
@@ -21,30 +33,20 @@ class MyApp(ShowBase):
 		self.wiimote.setScale(20)
 		self.wiimote.setPos(2,10,-0.5)
 		self.wiimote.setHpr(0,0,0)
-		#self.taskMgr.add(self.spinWiimote,"spinWiimote")
 
-		self.buttonA = OnscreenImage(image="resources/glyphs/Wii_A.png")
-		self.buttonA.setTransparency(TransparencyAttrib.MAlpha)
-		self.buttonA.setScale(0.25)
-		self.buttonA.setPos(-1.5,0,-0.7)
-		self.buttonA.setColor(1,1,1,0.25)
+		self.buttonA = ButtonVisual(image="Wii_A",pos=(-1.5,0,-0.7),scale=0.25)
+		self.buttonB = ButtonVisual(image="Wii_B",pos=(-1,0,-0.7),scale=0.25)
+		self.buttonMinus = ButtonVisual(image="Wii_Minus",pos=(-1.6,0,-0.3),scale=0.175)
+		self.buttonPlus = ButtonVisual(image="Wii_Plus",pos=(-1.3,0,-0.3),scale=0.175)
+		self.buttonHome = ButtonVisual(image="Wii_Home",pos=(-1,0,-0.3),scale=0.175)
 
-		self.buttonB = OnscreenImage(image="resources/glyphs/Wii_B.png")
-		self.buttonB.setTransparency(TransparencyAttrib.MAlpha)
-		self.buttonB.setScale(0.25)
-		self.buttonB.setPos(-1,0,-0.7)
-		self.buttonB.setColor(1,1,1,0.25)
-
-		self.controller = lib.wiimote.Wiimote()
-		self.controller.start()
-		self.controller.changeReportingMode("CoreButtonsAccelerometer")
-		self.taskMgr.add(self.getData,"WiimoteFeedback")
-
-	def spinWiimote(self, task):
-		#self.wiimote.setH(task.time*100.0)
-		self.wiimote.setP(task.time*100.0)
-		self.wiimote.setR(task.time*100.0)
-		return Task.cont
+		try:
+			self.controller = lib.wiimote.Wiimote()
+			self.controller.start()
+			self.controller.changeReportingMode("CoreButtonsAccelerometer")
+			self.taskMgr.add(self.getData,"WiimoteFeedback")
+		except ValueError:
+			self.buttonDisconnected = ButtonVisual(image="Controller_Disconnected",pos=(0,0,0),scale=0.5)
 
 	def getData(self, task):
 		data = self.controller.feedback()
@@ -59,5 +61,5 @@ class MyApp(ShowBase):
 
 if __name__ == "__main__":
 	loadPrcFile("cfg.prc")
-	app = MyApp()
+	app = App()
 	app.run()
