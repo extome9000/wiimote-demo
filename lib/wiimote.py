@@ -5,20 +5,22 @@ import time
 import hid
 
 LEFT_BYTE_BINDING = {
-    0b00001: "dpad_left",
-    0b00010: "dpad_right",
-    0b00100: "dpad_down",
-    0b01000: "dpad_up",
-    0b10000: "plus",
+    0: "none",
+    1: "dpad_left",
+    2: "dpad_right",
+    4: "dpad_down",
+    8: "dpad_up",
+    16: "plus",
 }
 
 RIGHT_BYTE_BINDINGS = {
-    0b00000001: "two",
-    0b00000010: "one",
-    0b00000100: "b",
-    0b00001000: "a",
-    0b00010000: "minus",
-    0b10000000: "home",
+    0: "none",
+    1: "two",
+    2: "one",
+    4: "b",
+    8: "a",
+    16: "minus",
+    128: "home",
 }
 
 REPORTING_MODES = {

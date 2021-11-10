@@ -4,8 +4,10 @@ from panda3d.core import *
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from direct.gui.OnscreenImage import OnscreenImage
+from direct.interval.LerpInterval import LerpHprInterval
 import lib.wiimote
 import math
+import os
 
 GLYPH_PATH = "resources/glyphs/"
 
@@ -20,10 +22,8 @@ class ButtonVisual(OnscreenImage):
 
 
 class App(ShowBase):
-	def __init__(self):
+	def __init__(self) -> None:
 		super().__init__(self)
-
-		#self.accept("space", self.throwWiimote)
 
 		self.camera.setPos(0,0,-5)
 		self.camera.setHpr(0,0,0)
@@ -37,8 +37,16 @@ class App(ShowBase):
 		self.buttonA = ButtonVisual(image="Wii_A",pos=(-1.5,0,-0.7),scale=0.25)
 		self.buttonB = ButtonVisual(image="Wii_B",pos=(-1,0,-0.7),scale=0.25)
 		self.buttonMinus = ButtonVisual(image="Wii_Minus",pos=(-1.6,0,-0.3),scale=0.175)
-		self.buttonPlus = ButtonVisual(image="Wii_Plus",pos=(-1.3,0,-0.3),scale=0.175)
-		self.buttonHome = ButtonVisual(image="Wii_Home",pos=(-1,0,-0.3),scale=0.175)
+		self.buttonHome = ButtonVisual(image="Wii_Home",pos=(-1.3,0,-0.3),scale=0.175)
+		self.buttonPlus = ButtonVisual(image="Wii_Plus",pos=(-1,0,-0.3),scale=0.175)
+		
+		self.buttonList = {
+			"r4": self.buttonB,
+			"r8": self.buttonA,
+			"r16": self.buttonMinus,
+			"r128": self.buttonHome,
+			"l16": self.buttonPlus,
+		}
 
 		try:
 			self.controller = lib.wiimote.Wiimote()
@@ -51,12 +59,26 @@ class App(ShowBase):
 	def getData(self, task):
 		data = self.controller.feedback()
 		if data:
-			if data[0] == 0x31:
-				x, y, z = data[3]-128, data[4]-128, data[5]-128
-				r = math.atan2(y,z) * (180/math.pi) + 90
-				p = math.atan2(-x,math.sqrt(y*y + z*z)) * (180/math.pi)
-				# Yaw is impossible to calculate without a gyroscope or compass.
-				self.wiimote.setHpr(180,r,p)
+			l,r = data[1] & 159, data[2] & 159 # Bit mask over LSBs (0b10011111)
+
+			if f"r{r}" in self.buttonList: self.buttonList[f"r{r}"].setColor(1,1,1,1)
+			if f"l{l}" in self.buttonList: self.buttonList[f"l{l}"].setColor(1,1,1,1)
+
+			if r == 0:
+				for b in self.buttonList.items():
+					if b[0][0] == "r":
+						b[1].setColor(1,1,1,.25)
+			if l == 0:
+				for b in self.buttonList.items():
+					if b[0][0] == "l":
+						b[1].setColor(1,1,1,.25)
+
+			x, y, z = data[3]-128, data[4]-128, data[5]-128
+			r = math.atan2(y,z) * (180/math.pi) + 90
+			p = math.atan2(-x,math.sqrt(y*y + z*z)) * (180/math.pi)
+			# Yaw is impossible to calculate without a gyroscope or compass.
+			self.wiimote.setHpr(180,r,p)
+
 		return Task.cont
 
 if __name__ == "__main__":
