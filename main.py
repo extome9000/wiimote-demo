@@ -18,6 +18,11 @@ class ButtonVisual(OnscreenImage):
 		self.setScale(scale)
 		self.setColor(1,1,1,0.25)
 
+	def setVisual(self, fileName: str) -> None:
+		self.setImage(GLYPH_PATH+fileName+".png")
+		self.setTransparency(TransparencyAttrib.MAlpha)
+		self.setColor(1,1,1,1)
+
 
 class Stack:
 	def __init__(self, stackMax: int) -> None:
@@ -78,27 +83,19 @@ class App(ShowBase):
 		data = self.controller.feedback()
 		if data:
 			l,r = data[1] & 159, data[2] & 159 # Bit mask over LSBs (0b10011111)
-			print(l,r)
+
 			if f"r{r}" in self.buttonList: self.buttonList[f"r{r}"].setColor(1,1,1,1)
 			if f"l{l}" in self.buttonList: self.buttonList[f"l{l}"].setColor(1,1,1,1)
 
 			# yore ugleh
 			if l == 1:
-				self.buttonDpad.setImage("resources/glyphs/Wii_Dpad_Left.png")
-				self.buttonDpad.setTransparency(TransparencyAttrib.MAlpha)
-				self.buttonDpad.setColor(1,1,1,1)
+				self.buttonDpad.setVisual("Wii_Dpad_Left")
 			if l == 2:
-				self.buttonDpad.setImage("resources/glyphs/Wii_Dpad_Right.png")
-				self.buttonDpad.setTransparency(TransparencyAttrib.MAlpha)
-				self.buttonDpad.setColor(1,1,1,1)
+				self.buttonDpad.setVisual("Wii_Dpad_Right")
 			if l == 4:
-				self.buttonDpad.setImage("resources/glyphs/Wii_Dpad_Down.png")
-				self.buttonDpad.setTransparency(TransparencyAttrib.MAlpha)
-				self.buttonDpad.setColor(1,1,1,1)
+				self.buttonDpad.setVisual("Wii_Dpad_Down")
 			if l == 8:
-				self.buttonDpad.setImage("resources/glyphs/Wii_Dpad_Up.png")
-				self.buttonDpad.setTransparency(TransparencyAttrib.MAlpha)
-				self.buttonDpad.setColor(1,1,1,1)
+				self.buttonDpad.setVisual("Wii_Dpad_Up")
 
 			if r == 0:
 				for b in self.buttonList.items():
